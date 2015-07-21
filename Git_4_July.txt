@@ -1,0 +1,373 @@
+Difference between Version Control and Configuration Management:-
+
+Version control is necessary but not sufficient for configuration management. Version control happens in some central or distributed repository, but says nothing about where any particular version is deployed or used.
+
+Configuration management worries about how to take what is in version control and deploy that consistently to the appropriate places, primarily QA and production, but in a large enough development operation developers as well.
+
+For example, you may keep all of your SQL queries in version control, including your table modification scripts, but that doesn't control when those scripts are deployed to the appropriate database server and kept in sync with the deployment of any other code that relies on that database structure.
+
+--------------------------------------
+
+
+
+CR- Carriage return -- return to begining of line
+
+LF- Line Feed -- go to next line.
+
+Text files created on DOS/Windows machines have different line endings than files created on Unix/Linux. DOS uses carriage return and line feed ("\r\n") as a line ending, which Unix uses just line feed ("\n"). You need to be careful about transferring files between Windows machines and Unix machines to make sure the line endings are translated properly.
+
+
+
+EOL - End of Line - In computing, a newline, also known as a line ending, end of line (EOL), or line break, is a special character or sequence of characters signifying the end of a line of text. The actual codes representing a newline vary across operating systems, which can be a problem when exchanging text files between systems with different newline representations.
+
+
+
+
+--------------------
+
+
+--Everything in Git is check-summed before it is stored and is then referred to by that checksum. 
+The mechanism that Git uses for this checksumming is called a SHA-1 hash. This is a 40-character string composed of hexadecimal characters (0–9 and a–f) and calculated based on the contents of a file or directory structure in Git. A SHA-1 hash looks something like this:
+
+24b9da6552252987aa493b52f8696cd6d3b00373
+
+
+--Git stores everything in its database not by file name but by the hash value of its contents.
+
+--Git has three main states that your files can reside in: 
+
+committed, = committed means that the data is safely stored in your local database.
+
+modified, = Modified means that you have changed the file but have not committed it to your database yet.
+
+
+staged. = Staged means that you have marked a modified file in its current version to go into your next commit snapshot.
+
+
+------------------
+
+
+--This leads us to the three main sections of a Git project: 
+
+the Git directory, 
+
+the working directory, 
+
+the staging area.
+
+
+** Refer Git_Areas.png for a workflow.
+
+-------------------
+
+The Git directory is where Git stores the metadata and object database for your project. This is the most important part of Git, and it is what is copied when you clone a repository from another computer.
+
+The working directory is a single checkout of one version of the project. These files are pulled out of the compressed database in the Git directory and placed on disk for you to use or modify.
+
+The staging area is a file, generally contained in your Git directory, that stores information about what will go into your next commit. It’s sometimes referred to as the “index”, but it’s also common to refer to it as the staging area.
+
+
+
+---------------------------
+
+The basic Git workflow:-
+
+Modify----------->Stage----------->Commit
+
+
+
+------*************------*************------*************------*************------*************
+
+
+Initializing a Repository in an Existing Directory:-
+
+$ git init
+
+$ git add *.c
+$ git add LICENSE
+$ git commit -m 'initial project version'
+
+
+Cloning an Existing Repository:-
+
+$ git clone https://github.com/libgit2/libgit2
+
+
+That creates a directory named “libgit2”, initializes a .git directory inside it, pulls down all the data for that repository, and checks out a working copy of the latest version. If you go into the new libgit2 directory, you’ll see the project files in there, ready to be worked on or used. If you want to clone the repository into a directory named something other than “libgit2”, you can specify that as the next command-line option:
+
+$ git clone https://github.com/libgit2/libgit2 mylibgit
+
+
+
+----------
+
+Git has a number of different transfer protocols you can use. The previous example uses the https:// protocol, but you may also see git:// or user@server:path/to/repo.git, which uses the SSH transfer protocol.
+
+
+
+
+********************************
+
+Checking the status of your files:-
+
+git status
+
+
+
+-----
+
+Tracking New Files:-
+
+git add <filename>    -- used for staging files, used for tracking new files, used for marking merge-conflicted files as resolved....
+
+The git add command takes a path name for either a file or a directory; if it’s a directory, the command adds all the files in that directory recursively.
+
+------------------------
+
+Short Status
+While the git status output is pretty comprehensive, it’s also quite wordy. Git also has a short status flag so you can see your changes in a more compact way. If you run git status -s or git status --short you get a far more simplified output from the command.
+
+$ git status -s
+ M README
+MM Rakefile
+A  lib/git.rb
+M  lib/simplegit.rb
+?? LICENSE.txt
+
+
+New files that aren’t tracked have a ?? next to them, new files that have been added to the staging area have an A, modified files have an M and so on. There are two columns to the output - the left hand column indicates that the file is staged and the right hand column indicates that it’s modified. So for example in that output, the README file is modified in the working directory but not yet staged, while the lib/simplegit.rb file is modified and staged. The Rakefile was modified, staged and then modified again, so there are changes to it that are both staged and unstaged.
+
+----------------------------------------
+Ignoring Files
+
+Often, you’ll have a class of files that you don’t want Git to automatically add or even show you as being untracked. These are generally automatically generated files such as log files or files produced by your build system. In such cases, you can create a file listing patterns to match them named .gitignore. 
+
+
+
+$ cat .gitignore
+*.[oa]
+*~
+The first line tells Git to ignore any files ending in “.o” or “.a” – object and archive files that may be the product of building your code. The second line tells Git to ignore all files that end with a tilde (~), which is used by many text editors such as Emacs to mark temporary files.
+
+----------------------------------------
+
+Viewing Your Staged and Unstaged Changes:-
+
+These are the two questions that you will ask most frequently:-
+
+ What have you changed but not yet staged? 
+And what have you staged that you are about to commit? 
+
+
+Although git status answers those questions very generally by listing the file names, git diff shows you the exact lines added and removed – the patch, as it were.
+
+--To see what you’ve changed but not yet staged, type:- 
+
+git diff
+
+--If you want to see what you’ve staged that will go into your next commit, you can use git diff --staged. This command compares your staged changes to your last commit:
+
+
+git diff --staged
+
+--------------------------------------------------------
+
+Run git difftool --tool-help to see what is available on your system.
+
+
+--------------------------------------------------
+
+Commit with inline messaging:-
+
+git commit -m "Comit done after brainstorming on 5th of july 2015"
+
+
+-----------------------------------------------
+
+Skipping the Staging Area-------------------------
+
+
+git commit -a -m 'added new benchmarks'
+
+
+
+----------------
+
+Removing files:-
+
+git rm <file_name>    ---- this command stages the file's removal
+
+The next time you commit, the file will be gone and no longer tracked. If you modified the file and added it to the index already, you must force the removal with the -f option. This is a safety feature to prevent accidental removal of data that hasn’t yet been recorded in a snapshot and that can’t be recovered from Git.
+
+
+git rm -f file1.txt
+
+
+
+-----------------------
+
+
+Instruct Git not to track a file anymore:-
+
+
+Another useful thing you may want to do is to keep the file in your working tree but remove it from your staging area. In other words, you may want to keep the file on your hard drive but not have Git track it anymore. This is particularly useful if you forgot to add something to your .gitignore file and accidentally staged it, like a large log file or a bunch of .a compiled files. To do this, use the --cached option:
+
+$ git rm --cached README
+
+
+------------------------------
+
+Renaming a file in Git:-
+
+Thus it’s a bit confusing that Git has a mv command. If you want to rename a file in Git, you can run something like
+
+$ git mv file_from file_to
+and it works fine. In fact, if you run something like this and look at the status, you’ll see that Git considers it a renamed file:
+
+$ git mv README.md README
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    renamed:    README.md -> README
+
+
+---------------------------------------
+Viewing the commit history:-
+
+After you have created several commits, or if you have cloned a repository with an existing commit history, you’ll probably want to look back to see what has happened. The most basic and powerful tool to do this is the git log command.
+
+A huge number and variety of options to the git log command are available to show you exactly what you’re looking for.
+
+
+------
+
+One of the more helpful options is -p, which shows the difference introduced in each commit. You can also use -2, which limits the output to only the last two entries:
+
+
+git log -p -2
+
+
+
+--------------
+
+the --stat option prints below each commit entry a list of modified files, how many files were changed, and how many lines in those files were added and removed. It also puts a summary of the information at the end.
+
+Another really useful option is --pretty. This option changes the log output to formats other than the default. A few prebuilt options are available for you to use. The oneline option prints each commit on a single line, which is useful if you’re looking at a lot of commits. In addition, the short, full, and fuller options show the output in roughly the same format but with less or more information, respectively:
+
+$ git log --pretty=oneline
+ca82a6dff817ec66f44342007202690a93763949 changed the version number
+085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7 removed unnecessary test
+a11bef06a3f659402fe7563abf99ad00de2209e6 first commit
+The most interesting option is format, which allows you to specify your own log output format. This is especially useful when you’re generating output for machine parsing – because you specify the format explicitly, you know it won’t change with updates to Git:
+
+$ git log --pretty=format:"%h - %an, %ar : %s"
+ca82a6d - Scott Chacon, 6 years ago : changed the version number
+085bb3b - Scott Chacon, 6 years ago : removed unnecessary test
+a11bef0 - Scott Chacon, 6 years ago : first commit
+
+
+-----------------------------
+
+You may be wondering what the difference is between author and committer. The author is the person who originally wrote the work, whereas the committer is the person who last applied the work. So, if you send in a patch to a project and one of the core members applies the patch, both of you get credit – you as the author, and the core member as the committer. 
+
+
+
+
+Useful options for git log --pretty=format
+
+Option	
+Description of Output
+
+
+%H
+
+Commit hash
+
+%h
+
+Abbreviated commit hash
+
+%T
+
+Tree hash
+
+%t
+
+Abbreviated tree hash
+
+%P
+
+Parent hashes
+
+%p
+
+Abbreviated parent hashes
+
+%an
+
+Author name
+
+%ae
+
+Author e-mail
+
+%ad
+
+Author date (format respects the --date=option)
+
+%ar
+
+Author date, relative
+
+%cn
+
+Committer name
+
+%ce
+
+Committer email
+
+%cd
+
+Committer date
+
+%cr
+
+Committer date, relative
+
+%s
+
+Subject
+
+
+
+
+----------------------------------------
+
+Git log -- graph option
+
+The oneline and format options are particularly useful with another log option called --graph. This option adds a nice little ASCII graph showing your branch and merge history:
+
+$ git log --pretty=format:"%h %s" --graph
+
+or
+
+$ git log --pretty=oneline --graph
+
+
+-------------------------------
+
+Limiting log output  - putting time limits.
+
+ the time-limiting options such as --since and --until are very useful. For example, this command gets the list of commits made in the last two weeks:
+
+$ git log --since=2.weeks
+
+This command works with lots of formats – you can specify a specific date like "2008-01-15", or a relative date such as "2 years 1 day 3 minutes ago".
+
+
+
+
+git log --since=1.hour
